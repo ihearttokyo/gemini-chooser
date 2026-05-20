@@ -1,0 +1,12 @@
+- [x] Task 1: Create `manifest.json` with appropriate permissions and content script mapping.
+- [x] Task 2: Create beautiful glassmorphic `popup.html` and `popup.js` settings UI.
+- [x] Task 3: Create `content.js` with DOM observer and automated Extended switcher logic.
+- [x] Task 4: Package or programmatically generate extension icons.
+- [x] Task 5: Verify the extension's behavior and create `walkthrough.md`.
+- [x] Task 6: Expand the active model button query to support new Gemini variants ("Advanced", "Deep Think", etc.) and action exclusions.
+- [x] Task 7: Implement a dual-path logic to handle both direct "Extended" switches and submenus.
+- [x] Task 8: Build the integrated Diagnostics HUD into the extension popup for live DOM analysis.
+- [x] Task 9: Verify the updated extension files and syntax validity.
+- [x] Task 10: Implement cursor reset focus back to the text input box after model switching.
+- [x] Task 11: Conduct unit testing and verify layout/responsive compatibility at narrow window sizes.
+- [x] Task 12: Commit and push changes to GitHub.
