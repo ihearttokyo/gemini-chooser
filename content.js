@@ -128,6 +128,7 @@
     if (isUpgrading) return;
     isUpgrading = true;
     console.log("[Gemini Chooser] Upgrading active model to Extended...");
+    let success = false;
 
     try {
       const dropdownBtn = findActiveModelButton();
@@ -149,6 +150,7 @@
       if (extendedOption) {
         console.log("[Gemini Chooser] Found direct Extended option, clicking...");
         extendedOption.click();
+        success = true;
         console.log("[Gemini Chooser] Successfully upgraded to Extended model!");
         return;
       }
@@ -179,6 +181,7 @@
       }
 
       extendedOption.click();
+      success = true;
       console.log("[Gemini Chooser] Successfully upgraded to Extended model via submenu!");
     } catch (err) {
       console.error("[Gemini Chooser] Error during upgrade:", err);
@@ -186,6 +189,8 @@
       await sleep(300); // Cool down
       isUpgrading = false;
       updateCachedText();
+      // Let any closing animations finish completely before focusing the text area
+      setTimeout(resetInputFocus, 100);
     }
   }
 
@@ -194,6 +199,7 @@
     if (isUpgrading) return;
     isUpgrading = true;
     console.log(`[Gemini Chooser] Switching base model to ${targetModel}...`);
+    let triggeredUpgrade = false;
 
     try {
       const dropdownBtn = findActiveModelButton();
@@ -219,13 +225,64 @@
       // After switching base model, wait a little bit and then trigger upgrade to Extended
       await sleep(800);
       isUpgrading = false; // Release lock so upgradeToExtended can run
+      triggeredUpgrade = true;
       await upgradeToExtended();
     } catch (err) {
       console.error("[Gemini Chooser] Error switching base model:", err);
     } finally {
       isUpgrading = false;
       updateCachedText();
+      if (!triggeredUpgrade) {
+        // Let any closing animations finish completely before focusing the text area
+        setTimeout(resetInputFocus, 100);
+      }
     }
+  }
+
+  // Helper: Find the main Gemini chat text input box
+  function findTextInputBox() {
+    // 1. Contenteditable div is standard for Gemini's prompt input
+    const editableDiv = document.querySelector('div[contenteditable="true"]');
+    if (editableDiv) return editableDiv;
+
+    // 2. Sometimes role="textbox" is used
+    const textbox = document.querySelector('[role="textbox"]');
+    if (textbox) return textbox;
+
+    // 3. Fallback to any textarea
+    const textarea = document.querySelector('textarea');
+    if (textarea) return textarea;
+
+    // 4. Fallback to selectors commonly used by Gemini/Bard
+    const classFallbacks = document.querySelector('.ql-editor, .input-area, #chat-input, .prompt-textarea');
+    if (classFallbacks) return classFallbacks;
+
+    return null;
+  }
+
+  // Reset cursor focus to the text input box
+  function resetInputFocus() {
+    console.log("[Gemini Chooser] Resetting cursor to text input box...");
+    const inputEl = findTextInputBox();
+    if (inputEl) {
+      inputEl.focus();
+      try {
+        if (inputEl.tagName === 'DIV' && inputEl.getAttribute('contenteditable') === 'true') {
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.selectNodeContents(inputEl);
+          range.collapse(false); // collapse to end of text
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      } catch (err) {
+        console.warn("[Gemini Chooser] Error placing cursor in contenteditable:", err);
+      }
+      console.log("[Gemini Chooser] Cursor successfully reset and focused.");
+      return true;
+    }
+    console.warn("[Gemini Chooser] Could not find text input box to focus.");
+    return false;
   }
 
   function updateCachedText() {
