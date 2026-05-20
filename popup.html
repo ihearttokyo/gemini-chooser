@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gemini Chooser Options</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient-start: #0a0816;
+      --bg-gradient-end: #120e2e;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --accent-purple: #a855f7;
+      --accent-blue: #3b82f6;
+      --accent-glow: rgba(168, 85, 247, 0.25);
+      --toggle-inactive: rgba(255, 255, 255, 0.1);
+      --toggle-active: linear-gradient(135deg, #a855f7, #3b82f6);
+      --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      width: 330px;
+      min-height: 430px;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+      padding: 16px;
+    }
+
+    /* Ambient background glows */
+    .glow-1 {
+      position: absolute;
+      top: -50px;
+      left: -50px;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, rgba(168, 85, 247, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-2 {
+      position: absolute;
+      bottom: -50px;
+      right: -50px;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Header styling */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .logo-container {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+    }
+
+    .logo-svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
+    }
+
+    .title-wrapper h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(120deg, #ffffff 40%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .title-wrapper p {
+      font-size: 10px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* Tab bar switcher */
+    .tab-bar {
+      display: flex;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      padding: 3px;
+      border-radius: 8px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-family);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 0;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tabs Content Panes */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Main Settings Card */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .setting-label {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .setting-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .setting-desc {
+      font-size: 10px;
+      color: var(--text-secondary);
+      max-width: 210px;
+      line-height: 1.3;
+    }
+
+    /* Switch toggle button */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--toggle-inactive);
+      transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .slider {
+      background: var(--toggle-active);
+      box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Selection Box */
+    .dropdown-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .dropdown-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .select-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: 12px;
+      font-weight: 500;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    select:hover, select:focus {
+      border-color: var(--accent-purple);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .select-wrapper::after {
+      content: "▼";
+      font-size: 8px;
+      color: var(--text-secondary);
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    select option {
+      background-color: #120e2e;
+      color: var(--text-primary);
+    }
+
+    /* Diagnostics UI items */
+    .hud-box {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px;
+      height: 180px;
+      overflow-y: auto;
+      color: #38bdf8;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .hud-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1));
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .action-btn:hover {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2));
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 6px rgba(168, 85, 247, 0.2);
+    }
+
+    .action-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Stats Indicator Card */
+    .stats-card {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px dashed var(--card-border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stats-title {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pulse-dot {
+      width: 5px;
+      height: 5px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 5px #22c55e;
+      animation: pulse 1.5s infinite;
+    }
+
+    .stats-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: #22c55e;
+    }
+
+    /* Footer message */
+    footer {
+      text-align: center;
+      font-size: 9px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        <svg class="logo-svg" viewBox="0 0 24 24">
+          <path d="M12,2A10,10,0,0,0,2,12a10,10,0,0,0,10,10,10,10,0,0,0,10,-10A10,10,0,0,0,12,2Zm1.6,12.75L12,17l-1.6,-2.25L8,14l2.4,-0.75L12,11l1.6,2.25L16,14ZM12,6a1.5,1.5,0,1,1,-1.5,1.5A1.5,1.5,0,0,1,12,6Z"/>
+        </svg>
+      </div>
+      <div class="title-wrapper">
+        <h1>Gemini Chooser</h1>
+        <p>Auto-Select Extended Reasoning</p>
+      </div>
+    </header>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="tab-settings">Control Panel</button>
+      <button class="tab-btn" data-tab="tab-diagnostics">Diagnostics HUD</button>
+    </div>
+
+    <!-- Tab 1: Settings Control Panel -->
+    <div id="tab-settings" class="tab-content active">
+      <div class="glass-card">
+        <div class="setting-row">
+          <div class="setting-label">
+            <span class="setting-title">Auto-Upgrade</span>
+            <span class="setting-desc">Instantly upgrades standard models to their Extended thinking variant.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="auto-upgrade" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="dropdown-container">
+          <span class="dropdown-label">Default Startup Model</span>
+          <div class="select-wrapper">
+            <select id="default-model">
+              <option value="pro">3.1 Pro Extended</option>
+              <option value="flash">3.5 Flash Extended</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Diagnostics HUD -->
+    <div id="tab-diagnostics" class="tab-content">
+      <div class="glass-card">
+        <div class="hud-box" id="debug-log">No diagnostic run yet. Open https://gemini.google.com/app and click 'Run Scan' below to inspect the page DOM state.</div>
+        <div class="hud-buttons">
+          <button class="action-btn" id="run-scan">
+            <span>🔍 Run Scan</span>
+          </button>
+          <button class="action-btn" id="force-test">
+            <span>⚡ Test Click</span>
+          </button>
+          <button class="action-btn" id="copy-log" disabled>
+            <span>📋 Copy Log</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-card">
+      <span class="stats-title">
+        <span class="pulse-dot"></span>
+        Active Session Status
+      </span>
+      <span class="stats-value" id="status-text">ON</span>
+    </div>
+
+    <footer>
+      Created for Gemini Power Users
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
